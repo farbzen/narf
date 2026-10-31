@@ -12,7 +12,7 @@ _NixOS Advanced Rebuild Flake_
 [![Cachix](https://img.shields.io/badge/cachix-farbzen-4A90D9?style=flat-square)](https://farbzen.cachix.org)
 [![License](https://img.shields.io/badge/license-MIT-green?style=flat-square)](LICENSE)
 
-[Overview](#overview) • [Features](#features) • [Getting Started](#getting-started) • [Applications](#applications) • [Development](#development) • [Deployment](#deployment) • [Documentation](#documentation) • [License](#license)
+[Overview](#overview) • [Getting Started](#getting-started) • [Applications](#applications) • [Documentation](#documentation)
 
 </div>
 
@@ -134,34 +134,12 @@ offers to save a new `--flake` value there. All options: `narf --help`.
 
 ### narf-tui
 
+Interactive frontend: choose the options in a form, check the repository state
+and follow the narf run in an embedded terminal.
+
 ```sh
 narf-tui
 ```
-
-## Development
-
-### Development environment
-
-```sh
-git clone https://github.com/farbzen/narf.nix.git
-cd narf.nix
-devenv shell              # or: direnv allow
-```
-
-[devenv](https://devenv.sh) provides the Nix tooling; the `.envrc` loads it
-automatically with [direnv](https://direnv.net).
-
-### Build and check
-
-```sh
-nix build .#narf          # build the workspace
-nix flake check           # evaluate all outputs
-nix run nixpkgs#alejandra -- flake.nix packages/default.nix
-```
-
-> [!IMPORTANT]
-> Flakes only see files tracked by git. Run `git add` on new files before
-> `nix build` or `nix flake check`.
 
 ## Deployment
 
@@ -172,6 +150,7 @@ newer nixpkgs revision to `flake.lock` and pushes the packages for
 
 ## Documentation
 
+- [Development environment and checks](docs/development.md)
 - [Deployment and binary cache](docs/deployment.md)
 - [Changelog](CHANGELOG.md)
 
