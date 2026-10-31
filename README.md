@@ -12,7 +12,7 @@ _NixOS Advanced Rebuild Flake_
 [![Cachix](https://img.shields.io/badge/cachix-farbzen-4A90D9?style=flat-square)](https://farbzen.cachix.org)
 [![License](https://img.shields.io/badge/license-MIT-green?style=flat-square)](LICENSE)
 
-[Overview](#overview) • [Getting Started](#getting-started) • [Applications](#applications) • [Documentation](#documentation)
+[Overview](#overview) • [Getting Started](#getting-started) • [Applications](#applications) • [Development](#development) • [Documentation](#documentation)
 
 </div>
 
@@ -66,7 +66,6 @@ The workspace consists of the following applications:
 git clone https://github.com/farbzen/narf.nix.git
 cd narf.nix
 devenv shell              # or: direnv allow
-nix build .#narf          # build the workspace
 ```
 
 > [!TIP]
@@ -107,6 +106,25 @@ and follow the narf run in an embedded terminal.
 nix run github:farbzen/narf.nix#narf-tui
 narf-tui
 ```
+
+## Development
+
+### Build
+
+```sh
+nix build .#narf          # build the workspace (both binaries)
+nix flake check           # evaluate all flake outputs
+```
+
+### Code quality
+
+Nix files are formatted with [alejandra](https://github.com/kamadorueda/alejandra):
+
+```sh
+nix run nixpkgs#alejandra -- flake.nix packages/default.nix
+```
+
+More in [docs/development.md](docs/development.md).
 
 ## Deployment
 
