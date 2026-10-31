@@ -12,7 +12,7 @@ _NixOS Advanced Rebuild Flake_
 [![Cachix](https://img.shields.io/badge/cachix-farbzen-4A90D9?style=flat-square)](https://farbzen.cachix.org)
 [![License](https://img.shields.io/badge/license-MIT-green?style=flat-square)](LICENSE)
 
-[Overview](#overview) • [Applications](#applications) • [Documentation](#documentation)
+[Overview](#overview) • [Getting Started](#getting-started) • [Applications](#applications) • [Documentation](#documentation)
 
 </div>
 
@@ -50,6 +50,28 @@ The workspace consists of the following applications:
   host defaults to the current hostname.
 - **TUI**: pick options in a form, see the repository state (upstream,
   unpushed commits, changes, inputs) and run narf in an embedded terminal.
+
+## Getting Started
+
+### Prerequisites
+
+- [Nix](https://nixos.org) with the `nix-command` and `flakes` features enabled
+- a NixOS configuration flake in a git repository
+- for development: [devenv](https://devenv.sh) (provides the Nix tooling),
+  optionally [direnv](https://direnv.net)
+
+### Development environment
+
+```sh
+git clone https://github.com/farbzen/narf.nix.git
+cd narf.nix
+devenv shell              # or: direnv allow
+nix build .#narf          # build the workspace
+```
+
+> [!TIP]
+> Flakes only see files tracked by git. Run `git add` on new files before
+> `nix build` or `nix flake check`.
 
 ## Applications
 
