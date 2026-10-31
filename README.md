@@ -12,7 +12,7 @@ _NixOS Advanced Rebuild Flake_
 [![Cachix](https://img.shields.io/badge/cachix-farbzen-4A90D9?style=flat-square)](https://farbzen.cachix.org)
 [![License](https://img.shields.io/badge/license-MIT-green?style=flat-square)](LICENSE)
 
-[Overview](#overview) • [Getting Started](#getting-started) • [Applications](#applications) • [Documentation](#documentation)
+[Overview](#overview) • [Applications](#applications) • [Documentation](#documentation)
 
 </div>
 
@@ -24,7 +24,8 @@ NixOS users who manage their systems with a flake in a git repository.
 
 The flake builds the Rust workspace under `packages/` and exposes it as
 packages and as an overlay for Linux systems (`x86_64-linux`,
-`aarch64-linux`).
+`aarch64-linux`). Prebuilt binaries are served from the binary cache
+[farbzen.cachix.org](https://farbzen.cachix.org).
 
 The workspace consists of the following applications:
 
@@ -34,15 +35,6 @@ The workspace consists of the following applications:
 - **narf-tui** – terminal UI frontend for narf, built with
   [ratatui](https://ratatui.rs) and [tui-term](https://docs.rs/tui-term). The
   code lives in `packages/narf-tui/`.
-
-Flake outputs:
-
-| Output                       | Content                                 |
-| ---------------------------- | --------------------------------------- |
-| `packages.<system>.narf`     | both binaries, `nix run` starts `narf`  |
-| `packages.<system>.narf-tui` | same build, `nix run` starts `narf-tui` |
-| `packages.<system>.default`  | alias for `narf`                        |
-| `overlays.default`           | adds `narf` and `narf-tui` to `pkgs`    |
 
 ## Features
 
@@ -59,71 +51,23 @@ Flake outputs:
 - **TUI**: pick options in a form, see the repository state (upstream,
   unpushed commits, changes, inputs) and run narf in an embedded terminal.
 
-## Getting Started
+## Applications
 
-### Prerequisites
-
-- [Nix](https://nixos.org) with the `nix-command` and `flakes` features enabled
-
-### Try it
-
-```sh
-nix run github:farbzen/narf.nix -- --help
-nix run github:farbzen/narf.nix#narf-tui
-```
-
-### Install on NixOS
-
-```nix
-{
-  inputs.narf.url = "github:farbzen/narf.nix";
-
-  outputs = {nixpkgs, narf, ...}: {
-    nixosConfigurations.<host> = nixpkgs.lib.nixosSystem {
-      modules = [
-        {
-          nixpkgs.overlays = [narf.overlays.default];
-        }
-        ({pkgs, ...}: {
-          environment.systemPackages = [pkgs.narf];
-        })
-      ];
-    };
-  };
-}
-```
+Both applications run without installation via `nix run`. To add them to a
+NixOS configuration through the overlay and to enable the binary cache, see
+[docs/installation.md](docs/installation.md).
 
 > [!NOTE]
 > `narf` and `narf-tui` are the same derivation; installing one of them puts
-> both binaries on the `PATH`. Both are wrapped with
-> [nh](https://github.com/nix-community/nh) and git, which narf calls for the
-> rebuild and the commits. nix and nixos-rebuild are taken from the NixOS
-> system.
-
-### Binary cache
-
-Prebuilt packages for the locked nixpkgs revision are served from
-[farbzen.cachix.org](https://farbzen.cachix.org):
-
-```nix
-{
-  nix.settings = {
-    extra-substituters = ["https://farbzen.cachix.org"];
-    extra-trusted-public-keys = ["farbzen.cachix.org-1:8KQga60LYPZVg0E4iKZgQhTmI5dV38Mb9iSuryp8BoY="];
-  };
-}
-```
-
-> [!TIP]
-> Cache hits require narf's own nixpkgs input. With
-> `inputs.narf.inputs.nixpkgs.follows = "nixpkgs"` the packages are built
-> locally.
-
-## Applications
+> both binaries on the `PATH`.
 
 ### narf
 
+Updates the flake inputs, rebuilds the system with
+[nh](https://github.com/nix-community/nh) and commits the new generation.
+
 ```sh
+nix run github:farbzen/narf.nix -- --help
 narf --update --push      # update inputs, rebuild, commit and push
 narf --dry                # only show what would be done
 narf -U nixpkgs -b        # update only nixpkgs, build without switching
@@ -138,6 +82,7 @@ Interactive frontend: choose the options in a form, check the repository state
 and follow the narf run in an embedded terminal.
 
 ```sh
+nix run github:farbzen/narf.nix#narf-tui
 narf-tui
 ```
 
@@ -150,6 +95,7 @@ newer nixpkgs revision to `flake.lock` and pushes the packages for
 
 ## Documentation
 
+- [Installation, flake outputs and binary cache](docs/installation.md)
 - [Development environment and checks](docs/development.md)
 - [Deployment and binary cache](docs/deployment.md)
 - [Changelog](CHANGELOG.md)
