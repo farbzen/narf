@@ -12,7 +12,8 @@ _NixOS Advanced Rebuild Flake_
 [![Cachix](https://img.shields.io/badge/cachix-farbzen-4A90D9?style=flat-square)](https://farbzen.cachix.org)
 [![License](https://img.shields.io/badge/license-MIT-green?style=flat-square)](LICENSE)
 
-[Overview](#overview) • [Getting Started](#getting-started) • [Applications](#applications) • [Development](#development) • [Documentation](#documentation)
+[Overview](#overview) • [Features](#features) •
+[Getting Started](#getting-started) • [Documentation](#documentation)
 
 </div>
 
@@ -24,7 +25,8 @@ NixOS users who manage their systems with a flake in a git repository.
 
 The flake builds the Rust workspace under `packages/` and exposes it as
 packages and as an overlay for Linux systems (`x86_64-linux`,
-`aarch64-linux`). Prebuilt binaries are served from the binary cache
+`aarch64-linux`). A GitHub Actions workflow keeps nixpkgs up to date and serves
+prebuilt binaries from the binary cache
 [farbzen.cachix.org](https://farbzen.cachix.org).
 
 The workspace consists of the following applications:
@@ -57,86 +59,49 @@ The workspace consists of the following applications:
 
 - [Nix](https://nixos.org) with the `nix-command` and `flakes` features enabled
 - a NixOS configuration flake in a git repository
-- for development: [devenv](https://devenv.sh) (provides the Nix tooling),
-  optionally [direnv](https://direnv.net)
 
-### Development environment
+### Installation
+
+Try both applications without installing:
 
 ```sh
-git clone https://github.com/farbzen/narf.nix.git
-cd narf.nix
-devenv shell              # or: direnv allow
+nix run github:farbzen/narf.nix -- --help
+nix run github:farbzen/narf.nix#narf-tui
 ```
 
-> [!TIP]
-> Flakes only see files tracked by git. Run `git add` on new files before
-> `nix build` or `nix flake check`.
+To install them on NixOS, add the flake as an input and its overlay to the
+configuration:
 
-## Applications
-
-Both applications run without installation via `nix run`. To add them to a
-NixOS configuration through the overlay and to enable the binary cache, see
-[docs/installation.md](docs/installation.md).
+```nix
+inputs.narf.url = "github:farbzen/narf.nix";
+# in a NixOS module:
+nixpkgs.overlays = [narf.overlays.default];
+environment.systemPackages = [pkgs.narf];
+```
 
 > [!NOTE]
 > `narf` and `narf-tui` are the same derivation; installing one of them puts
 > both binaries on the `PATH`.
 
-### narf
+The full example and the binary cache settings are in
+[docs/installation.md](docs/installation.md).
 
-Updates the flake inputs, rebuilds the system with
-[nh](https://github.com/nix-community/nh) and commits the new generation.
+### Usage
 
 ```sh
-nix run github:farbzen/narf.nix -- --help
 narf --update --push      # update inputs, rebuild, commit and push
 narf --dry                # only show what would be done
 narf -U nixpkgs -b        # update only nixpkgs, build without switching
+narf-tui                  # interactive frontend
 ```
 
 Without `--flake`, narf reads the flake path from `~/.config/narf/flake` and
 offers to save a new `--flake` value there. All options: `narf --help`.
 
-### narf-tui
-
-Interactive frontend: choose the options in a form, check the repository state
-and follow the narf run in an embedded terminal.
-
-```sh
-nix run github:farbzen/narf.nix#narf-tui
-narf-tui
-```
-
-## Development
-
-### Build
-
-```sh
-nix build .#narf          # build the workspace (both binaries)
-nix flake check           # evaluate all flake outputs
-```
-
-### Code quality
-
-Nix files are formatted with [alejandra](https://github.com/kamadorueda/alejandra):
-
-```sh
-nix run nixpkgs#alejandra -- flake.nix packages/default.nix
-```
-
-More in [docs/development.md](docs/development.md).
-
-## Deployment
-
-A GitHub Actions workflow checks nixos-unstable every six hours, commits a
-newer nixpkgs revision to `flake.lock` and pushes the packages for
-`x86_64-linux` and `aarch64-linux` to the binary cache. Details in
-[docs/deployment.md](docs/deployment.md).
-
 ## Documentation
 
 - [Installation, flake outputs and binary cache](docs/installation.md)
-- [Development environment and checks](docs/development.md)
+- [Development environment, build and checks](docs/development.md)
 - [Deployment and binary cache](docs/deployment.md)
 - [Changelog](CHANGELOG.md)
 
