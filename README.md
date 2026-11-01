@@ -23,13 +23,17 @@ NixOS users who manage their systems with a flake in a git repository.
 
 ## Overview
 
+A plain `nixos-rebuild` leaves no trace in the configuration repository. narf
+wraps update, rebuild and commit into one step, so the git history of the flake
+doubles as a log of every generation built on each host.
+
 The flake builds the Rust workspace under `packages/` and exposes it as
 packages and as an overlay for Linux systems (`x86_64-linux`,
 `aarch64-linux`). A GitHub Actions workflow keeps nixpkgs up to date and serves
 prebuilt binaries from the binary cache
 [farbzen.cachix.org](https://farbzen.cachix.org).
 
-The workspace consists of the following applications:
+The monorepo consists of the following applications:
 
 - **narf** – command-line tool that updates, rebuilds and commits a NixOS
   flake, built with [clap](https://docs.rs/clap) and
@@ -41,13 +45,16 @@ The workspace consists of the following applications:
 ## Features
 
 - **Rebuild as commit**: every new generation is committed with host,
-  generation number, NixOS and kernel version in the message.
+  generation number, NixOS and kernel version in the message, optionally with
+  a comment (`-c`).
 - **Input updates**: update all flake inputs (`-u`) or selected ones (`-U`)
   before rebuilding.
 - **Git sync**: pull before (`-p`) and push after (`-P`) the rebuild, with
-  unpushed rebuild commits squashed into one.
+  unpushed rebuild commits squashed into one unless `-S` is given.
 - **Safe modes**: dry run (`-d`), build without switching (`-b`) and skipping
   unchanged flakes (`-n`).
+- **Scriptable**: answer all prompts with yes (`-y`) and show a trace of
+  failing rebuilds (`-t`).
 - **Remembered flake**: the flake path is saved in `~/.config/narf/flake`, the
   host defaults to the current hostname.
 - **TUI**: pick options in a form, see the repository state (upstream,
