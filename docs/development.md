@@ -28,9 +28,12 @@ as rendering are not covered. `nix build` runs the tests as well.
 The workflow [`.github/workflows/rust.yml`](../.github/workflows/rust.yml)
 runs the same commands in the devenv shell on pushes to `main` and on pull
 requests that touch the Cargo workspace, the devenv files or the workflow.
-A build job runs `cargo build --workspace --release --locked` on
-`x86_64-linux` and `aarch64-linux` and attaches `narf` and `narf-tui` to the
-run as the artifacts `narf-x86_64-linux` and `narf-aarch64-linux`.
+When a GitHub release is published, the workflow runs as well; after lint and
+tests have passed, a build job runs `cargo build --workspace --release
+--locked` on `x86_64-linux` and `aarch64-linux` and attaches `narf` and
+`narf-tui` to the run as the artifacts `narf-x86_64-linux` and
+`narf-aarch64-linux`. It also uploads them to the release as
+`narf-<system>` and `narf-tui-<system>`.
 
 > [!NOTE]
 > The ELF interpreter of the binaries points to the glibc in the Nix store of
