@@ -65,6 +65,10 @@ for example as `narf.nix`, and call it:
 }
 ```
 
+> [!IMPORTANT]
+> Copy `package.nix` from `main`, not from a release tag: the hashes of a
+> release are committed after its tag.
+
 To switch to another release, change `version` and set `hash` and `cargoHash`
 to `""`. The next build fails and prints the correct hashes in its `got:`
 lines; paste each in place of its `""`.

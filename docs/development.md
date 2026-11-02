@@ -68,14 +68,25 @@ builds outside the flake.
 
 ## Release
 
-1. Set the new version in `Cargo.toml` and `package.nix`, and move the
-   `Unreleased` entries in `CHANGELOG.md` to it.
-2. Commit, tag the commit as `v<version>` and push the tag.
-3. Set `hash` and `cargoHash` in `package.nix` to `""`, build the derivation
-   outside the flake and paste the hashes from the `got:` lines:
+1. Set the new version in `Cargo.toml`, `package.nix` and the version badge of
+   `README.md`, run `cargo check` to update `Cargo.lock`, and move the
+   `Unreleased` entries in `CHANGELOG.md` to a new `[<version>] - <date>`
+   section with its link at the end of the file.
+2. Commit as `chore(release): <version>`, tag the commit as `v<version>` and
+   push `main` and the tag.
+3. Set `hash` and `cargoHash` in `package.nix` to `""` and build the
+   derivation outside the flake:
 
    ```sh
    nix build --impure --expr 'with import <nixpkgs> {}; callPackage ./package.nix {}'
    ```
 
-4. Commit the updated `package.nix`.
+   The first build fails on `hash`, the second on `cargoHash`; paste the
+   value of each `got:` line in place of its `""`, then build once more.
+4. Commit and push the updated `package.nix`.
+5. Publish the GitHub release with the changelog section as notes, which
+   starts the build job that attaches the binaries:
+
+   ```sh
+   gh release create v<version> --verify-tag --title v<version> --notes-file <notes.md>
+   ```
