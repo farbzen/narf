@@ -27,15 +27,6 @@ A plain `nixos-rebuild` leaves no trace in the configuration repository. NARF
 wraps update, rebuild and commit into one step, so the git history of the flake
 doubles as a log of every generation built on each host.
 
-NARF is a Rust workspace with a Nix derivation in `package.nix`, which can be
-copied into a NixOS configuration and fetches the release from GitHub on its
-own. The flake builds the same derivation from the local checkout and exposes
-it as packages and as an overlay for Linux systems (`x86_64-linux`,
-`aarch64-linux`). A GitHub Actions workflow checks formatting, runs clippy and
-the unit tests on every change to the Rust code and, for each published
-release, builds the binaries for both systems and attaches them to the
-release.
-
 The repository consists of the following applications:
 
 - **narf** – command-line tool that updates, rebuilds and commits a NixOS
