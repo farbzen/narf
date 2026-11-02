@@ -1,5 +1,5 @@
 {pkgs, ...}: {
-  environment.systemPackages = with pkgs; [
+  packages = with pkgs; [
     openssl
     pkg-config
   ];
