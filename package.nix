@@ -14,10 +14,10 @@ rustPlatform.buildRustPackage (finalAttrs: {
     owner = "farbzen";
     repo = "narf";
     tag = "v${finalAttrs.version}";
-    hash = "";
+    hash = "sha256-lhfJxQzUzUZzVhs3Blcj3W5EpC5Q2NS3NF1pE+QeeQ8=";
   };
 
-  cargoHash = "sha256-y5gnmVLIGHFLN1nf27kJ0SssVdEm9AGGDJda6uYSEps=";
+  cargoHash = "sha256-9VcsZ2iOmn6oAHFHnK23zXssdTm2aiA9+96gk7kNpfU=";
 
   nativeBuildInputs = [makeWrapper];
 
