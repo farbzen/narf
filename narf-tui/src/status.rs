@@ -1,4 +1,4 @@
-//! Information about the flake repository narf will operate on.
+//! Information about the flake repository NARF will operate on.
 
 use std::{
     path::{Path, PathBuf},
@@ -27,7 +27,7 @@ pub fn display_path(path: &Path) -> String {
     }
 }
 
-/// Resolves the flake like narf: the `--flake` value if given, otherwise
+/// Resolves the flake like NARF: the `--flake` value if given, otherwise
 /// the path saved in ~/.config/narf/flake.
 fn resolve_flake(flake_field: &str) -> Result<PathBuf, String> {
     let raw = if flake_field.trim().is_empty() {
@@ -60,10 +60,13 @@ fn git(path: &Path, args: &[&str]) -> Option<String> {
 
 /// Names of the root inputs in the flake's lock file.
 fn flake_inputs(path: &Path) -> Vec<String> {
-    let Some(lock) = std::fs::read_to_string(path.join("flake.lock"))
-        .ok()
-        .and_then(|text| serde_json::from_str::<serde_json::Value>(&text).ok())
-    else {
+    std::fs::read_to_string(path.join("flake.lock"))
+        .map(|text| root_inputs(&text))
+        .unwrap_or_default()
+}
+
+fn root_inputs(lock_file: &str) -> Vec<String> {
+    let Ok(lock) = serde_json::from_str::<serde_json::Value>(lock_file) else {
         return Vec::new();
     };
 
@@ -181,4 +184,52 @@ pub fn load(flake_field: &str) -> Status {
         .unwrap_or_default();
     status.inputs = flake_inputs(&path);
     status
+}
+
+#[cfg(test)]
+mod tests {
+    use std::path::Path;
+
+    use super::{display_path, home, root_inputs};
+
+    #[test]
+    fn root_inputs_are_sorted_by_name() {
+        let lock = r#"{
+            "nodes": {
+                "nixpkgs": {},
+                "root": {"inputs": {"sops-nix": "sops-nix", "home-manager": "home-manager", "nixpkgs": "nixpkgs"}}
+            },
+            "root": "root"
+        }"#;
+        assert_eq!(root_inputs(lock), ["home-manager", "nixpkgs", "sops-nix"]);
+    }
+
+    #[test]
+    fn root_inputs_follow_a_renamed_root_node() {
+        let lock = r#"{
+            "nodes": {
+                "root": {"inputs": {"ignored": "ignored"}},
+                "root_2": {"inputs": {"nixpkgs": "nixpkgs"}}
+            },
+            "root": "root_2"
+        }"#;
+        assert_eq!(root_inputs(lock), ["nixpkgs"]);
+    }
+
+    #[test]
+    fn root_inputs_are_empty_for_invalid_or_input_free_locks() {
+        assert!(root_inputs("not json").is_empty());
+        assert!(root_inputs(r#"{"nodes": {"root": {}}, "root": "root"}"#).is_empty());
+    }
+
+    #[test]
+    fn paths_below_home_are_shortened() {
+        let nixos = home().expect("HOME is set").join("nixos");
+        assert_eq!(display_path(&nixos), "~/nixos");
+    }
+
+    #[test]
+    fn paths_outside_home_stay_absolute() {
+        assert_eq!(display_path(Path::new("/etc/nixos")), "/etc/nixos");
+    }
 }

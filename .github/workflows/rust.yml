@@ -1,0 +1,68 @@
+name: Rust
+
+on:
+  push:
+    branches: [main]
+    paths: &rust-paths
+      - Cargo.toml
+      - Cargo.lock
+      - narf/**
+      - narf-tui/**
+      - devenv.nix
+      - devenv.yaml
+      - devenv.lock
+      - .github/workflows/rust.yml
+  pull_request:
+    paths: *rust-paths
+  workflow_dispatch:
+
+concurrency:
+  group: rust-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  lint:
+    name: Format and clippy
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7.0.1
+
+      - uses: cachix/install-nix-action@v31.11.3
+
+      - uses: cachix/cachix-action@v17
+        with:
+          name: devenv
+
+      - name: Install devenv
+        run: nix profile add nixpkgs#devenv
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Check formatting
+        run: devenv shell -- cargo fmt --all --check
+
+      - name: Run clippy
+        run: devenv shell -- cargo clippy --workspace --all-targets --locked -- -D warnings
+
+  test:
+    name: Test
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7.0.1
+
+      - uses: cachix/install-nix-action@v31.11.3
+
+      - uses: cachix/cachix-action@v17
+        with:
+          name: devenv
+
+      - name: Install devenv
+        run: nix profile add nixpkgs#devenv
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Run tests
+        run: devenv shell -- cargo test --workspace --locked

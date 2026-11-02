@@ -2,8 +2,9 @@
 
 ## Prerequisites
 
-- [Nix](https://nixos.org) with the `nix-command` and `flakes` features enabled
-- a NixOS configuration flake in a git repository
+- [Nix](https://nixos.org); the flake outputs need the `nix-command` and
+  `flakes` features
+- a NixOS configuration flake in a git repository, which NARF rebuilds
 
 ## Flake outputs
 
@@ -19,15 +20,15 @@ Supported systems: `x86_64-linux`, `aarch64-linux`.
 ## Try without installing
 
 ```sh
-nix run github:farbzen/narf.nix -- --help
-nix run github:farbzen/narf.nix#narf-tui
+nix run github:farbzen/narf -- --help
+nix run github:farbzen/narf#narf-tui
 ```
 
 ## Install on NixOS
 
 ```nix
 {
-  inputs.narf.url = "github:farbzen/narf.nix";
+  inputs.narf.url = "github:farbzen/narf";
 
   outputs = {nixpkgs, narf, ...}: {
     nixosConfigurations.<host> = nixpkgs.lib.nixosSystem {
@@ -47,27 +48,27 @@ nix run github:farbzen/narf.nix#narf-tui
 > [!NOTE]
 > `narf` and `narf-tui` are the same derivation; installing one of them puts
 > both binaries on the `PATH`. Both are wrapped with
-> [nh](https://github.com/nix-community/nh) and git, which narf calls for the
+> [nh](https://github.com/nix-community/nh) and git, which NARF calls for the
 > rebuild and the commits. nix and nixos-rebuild are taken from the NixOS
 > system.
 
-## Binary cache
+## Install without the flake
 
-Prebuilt packages for the locked nixpkgs revision are served from
-[farbzen.cachix.org](https://farbzen.cachix.org):
+[`package.nix`](../package.nix) is a self-contained derivation in nixpkgs
+style: it fetches the tagged release with `fetchFromGitHub` and builds it with
+the nixpkgs of the importing configuration. Copy it into the configuration,
+for example as `narf.nix`, and call it:
 
 ```nix
-{
-  nix.settings = {
-    extra-substituters = ["https://farbzen.cachix.org"];
-    extra-trusted-public-keys = ["farbzen.cachix.org-1:8KQga60LYPZVg0E4iKZgQhTmI5dV38Mb9iSuryp8BoY="];
-  };
+{pkgs, ...}: {
+  environment.systemPackages = [(pkgs.callPackage ./narf.nix {})];
 }
 ```
 
-> [!TIP]
-> Cache hits require narf's own nixpkgs input. With
-> `inputs.narf.inputs.nixpkgs.follows = "nixpkgs"` the packages are built
-> locally.
+To switch to another release, change `version` and set `hash` and `cargoHash`
+to `""`. The next build fails and prints the correct hashes in its `got:`
+lines; paste each in place of its `""`.
 
-How the cache is filled is described in [deployment.md](deployment.md).
+> [!NOTE]
+> This works without flakes; the build uses the nixpkgs revision of the
+> configuration.

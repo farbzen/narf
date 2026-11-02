@@ -21,7 +21,7 @@ pub enum Value {
     Text(String),
 }
 
-/// One narf option.
+/// One NARF option.
 pub struct Field {
     pub flag: char,
     pub label: &'static str,
@@ -68,7 +68,7 @@ pub enum Mode {
 
 /// One entry of the host picker.
 pub enum HostChoice {
-    /// No `-H`, narf uses the hostname.
+    /// No `-H`, NARF uses the hostname.
     Default,
     Host(String),
     /// Type the host by hand.
@@ -95,49 +95,51 @@ pub struct App {
     quit: bool,
 }
 
+fn default_fields() -> Vec<Field> {
+    vec![
+        Field::toggle('p', "Pull", "Pull new commits from origin before running"),
+        Field::toggle(
+            'u',
+            "Update all inputs",
+            "Update all flake inputs before running",
+        ),
+        Field::toggle(
+            'b',
+            "Build only",
+            "Build the new generation without switching",
+        ),
+        Field::toggle('d', "Dry run", "Only evaluate and state what WOULD be done"),
+        Field::toggle('t', "Show trace", "Show trace of the rebuild"),
+        Field::toggle(
+            'n',
+            "Skip unchanged",
+            "Do not rebuild if no changes were found",
+        ),
+        Field::toggle(
+            'y',
+            "Yes to all",
+            "Answer all prompts with yes (non-interactive)",
+        ),
+        Field::toggle('P', "Push", "Push new commits to origin"),
+        Field::toggle('S', "Don't squash", "Don't squash commits before pushing"),
+        Field::text('c', "Comment", "Add a comment to the resulting commit"),
+        Field::text(
+            'f',
+            "Flake",
+            "Path to the flake (default: ~/.config/narf/flake)",
+        ),
+        Field::text(
+            'H',
+            "Host",
+            "NixOS host configuration of the flake (default: hostname)",
+        ),
+    ]
+}
+
 impl App {
     pub fn new() -> Self {
-        let fields = vec![
-            Field::toggle('p', "Pull", "Pull new commits from origin before running"),
-            Field::toggle(
-                'u',
-                "Update all inputs",
-                "Update all flake inputs before running",
-            ),
-            Field::toggle(
-                'b',
-                "Build only",
-                "Build the new generation without switching",
-            ),
-            Field::toggle('d', "Dry run", "Only evaluate and state what WOULD be done"),
-            Field::toggle('t', "Show trace", "Show trace of the rebuild"),
-            Field::toggle(
-                'n',
-                "Skip unchanged",
-                "Do not rebuild if no changes were found",
-            ),
-            Field::toggle(
-                'y',
-                "Yes to all",
-                "Answer all prompts with yes (non-interactive)",
-            ),
-            Field::toggle('P', "Push", "Push new commits to origin"),
-            Field::toggle('S', "Don't squash", "Don't squash commits before pushing"),
-            Field::text('c', "Comment", "Add a comment to the resulting commit"),
-            Field::text(
-                'f',
-                "Flake",
-                "Path to the flake (default: ~/.config/narf/flake)",
-            ),
-            Field::text(
-                'H',
-                "Host",
-                "NixOS host configuration of the flake (default: hostname)",
-            ),
-        ];
-
         let mut app = Self {
-            fields,
+            fields: default_fields(),
             inputs: Vec::new(),
             focus: Focus::Options,
             options_state: ListState::default().with_selected(Some(0)),
@@ -210,7 +212,7 @@ impl App {
             .and_then(|i| self.fields.get(i))
     }
 
-    /// The arguments narf will be called with.
+    /// The arguments NARF will be called with.
     pub fn args(&self) -> Vec<String> {
         let mut args = Vec::new();
         for field in &self.fields {
@@ -243,7 +245,7 @@ impl App {
         self.command = parts.join(" ");
     }
 
-    /// Combinations narf accepts but silently ignores, and an unknown host.
+    /// Combinations NARF accepts but silently ignores, and an unknown host.
     pub fn hints(&self) -> Vec<String> {
         let mut hints = Vec::new();
         if self.toggled('S') && !self.toggled('P') {
@@ -267,7 +269,7 @@ impl App {
         hints
     }
 
-    /// The host narf will build for.
+    /// The host NARF will build for.
     pub fn host(&self) -> &str {
         match self.text('H') {
             "" => &self.status.default_host,
@@ -540,5 +542,311 @@ fn shell_quote(arg: &str) -> String {
         arg.to_owned()
     } else {
         format!("'{}'", arg.replace('\'', r"'\''"))
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use ratatui::{
+        crossterm::event::{KeyCode, KeyEvent},
+        widgets::ListState,
+    };
+
+    use super::{App, Focus, HostChoice, Input, Mode, Value, default_fields, shell_quote};
+    use crate::status::{Hosts, Status};
+
+    fn app_with_inputs(inputs: &[&str]) -> App {
+        let inputs: Vec<String> = inputs.iter().map(|name| (*name).to_owned()).collect();
+        let mut app = App {
+            fields: default_fields(),
+            inputs: Vec::new(),
+            focus: Focus::Options,
+            options_state: ListState::default().with_selected(Some(0)),
+            inputs_state: ListState::default(),
+            mode: Mode::Form,
+            status: Status {
+                flake: Err("no flake configured".to_owned()),
+                default_host: "laptop".to_owned(),
+                upstream: None,
+                unpushed: None,
+                head: None,
+                changes: Vec::new(),
+                inputs,
+            },
+            hosts: Hosts::default(),
+            command: String::new(),
+            error: None,
+            quit: false,
+        };
+        app.sync_inputs();
+        app
+    }
+
+    fn app() -> App {
+        app_with_inputs(&[])
+    }
+
+    fn value_mut(app: &mut App, flag: char) -> &mut Value {
+        &mut app
+            .fields
+            .iter_mut()
+            .find(|field| field.flag == flag)
+            .expect("known flag")
+            .value
+    }
+
+    fn switch_on(app: &mut App, flag: char) {
+        *value_mut(app, flag) = Value::Toggle(true);
+    }
+
+    fn type_text(app: &mut App, flag: char, text: &str) {
+        *value_mut(app, flag) = Value::Text(text.to_owned());
+    }
+
+    fn select_input(app: &mut App, name: &str) {
+        app.inputs
+            .iter_mut()
+            .find(|input| input.name == name)
+            .expect("known input")
+            .selected = true;
+    }
+
+    fn selected_inputs(app: &App) -> Vec<&str> {
+        app.inputs
+            .iter()
+            .filter(|input| input.selected)
+            .map(|input| input.name.as_str())
+            .collect()
+    }
+
+    #[test]
+    fn no_arguments_by_default() {
+        assert!(app().args().is_empty());
+    }
+
+    #[test]
+    fn switched_on_toggles_become_flags_in_field_order() {
+        let mut app = app();
+        switch_on(&mut app, 'P');
+        switch_on(&mut app, 'p');
+        assert_eq!(app.args(), ["-p", "-P"]);
+    }
+
+    #[test]
+    fn text_values_are_trimmed_and_blank_ones_skipped() {
+        let mut app = app();
+        type_text(&mut app, 'c', "  new kernel  ");
+        type_text(&mut app, 'H', "   ");
+        assert_eq!(app.args(), ["-c", "new kernel"]);
+    }
+
+    #[test]
+    fn tilde_is_expanded_only_in_the_flake_path() {
+        let mut app = app();
+        type_text(&mut app, 'c', "~/comment");
+        type_text(&mut app, 'f', "~/nixos");
+        assert_eq!(
+            app.args(),
+            [
+                "-c".to_owned(),
+                "~/comment".to_owned(),
+                "-f".to_owned(),
+                narf::flake::expand_tilde("~/nixos"),
+            ]
+        );
+    }
+
+    #[test]
+    fn selected_inputs_are_updated_individually() {
+        let mut app = app_with_inputs(&["home-manager", "nixpkgs"]);
+        select_input(&mut app, "nixpkgs");
+        assert_eq!(app.args(), ["-U", "nixpkgs"]);
+    }
+
+    #[test]
+    fn updating_all_inputs_drops_the_selection() {
+        let mut app = app_with_inputs(&["home-manager", "nixpkgs"]);
+        select_input(&mut app, "nixpkgs");
+        switch_on(&mut app, 'u');
+        assert_eq!(app.args(), ["-u"]);
+    }
+
+    #[test]
+    fn command_quotes_arguments_for_the_shell() {
+        let mut app = app();
+        switch_on(&mut app, 'y');
+        type_text(&mut app, 'c', "it's done");
+        app.update_command();
+        assert_eq!(app.command, r"narf -y -c 'it'\''s done'");
+    }
+
+    #[test]
+    fn shell_quote_keeps_safe_arguments() {
+        assert_eq!(shell_quote("/etc/nixos"), "/etc/nixos");
+        assert_eq!(shell_quote("-U"), "-U");
+        assert_eq!(shell_quote("user@host:1+2%,3=4"), "user@host:1+2%,3=4");
+    }
+
+    #[test]
+    fn shell_quote_wraps_unsafe_and_empty_arguments() {
+        assert_eq!(shell_quote("new kernel"), "'new kernel'");
+        assert_eq!(shell_quote("~/nixos"), "'~/nixos'");
+        assert_eq!(shell_quote(""), "''");
+        assert_eq!(shell_quote("it's"), r"'it'\''s'");
+    }
+
+    #[test]
+    fn no_hints_by_default() {
+        assert!(app().hints().is_empty());
+    }
+
+    #[test]
+    fn hints_name_ignored_combinations() {
+        let mut app = app_with_inputs(&["nixpkgs"]);
+        switch_on(&mut app, 'S');
+        switch_on(&mut app, 'd');
+        switch_on(&mut app, 'u');
+        type_text(&mut app, 'c', "comment");
+        select_input(&mut app, "nixpkgs");
+        assert_eq!(
+            app.hints(),
+            [
+                "Don't squash has no effect without Push",
+                "No commit (and no comment) in dry/build-only mode",
+                "Update all inputs overrides the input selection",
+            ]
+        );
+    }
+
+    #[test]
+    fn hints_that_push_is_skipped_when_building_only() {
+        let mut app = app();
+        switch_on(&mut app, 'P');
+        switch_on(&mut app, 'b');
+        assert_eq!(app.hints(), ["Push is skipped in dry/build-only mode"]);
+    }
+
+    #[test]
+    fn hints_at_a_host_missing_from_the_flake() {
+        let mut app = app();
+        app.hosts.names = vec!["desktop".to_owned()];
+        assert_eq!(
+            app.hints(),
+            ["Host 'laptop' is not in the flake's nixosConfigurations"]
+        );
+        type_text(&mut app, 'H', "desktop");
+        assert!(app.hints().is_empty());
+    }
+
+    #[test]
+    fn host_falls_back_to_the_hostname() {
+        let mut app = app();
+        assert_eq!(app.host(), "laptop");
+        type_text(&mut app, 'H', " desktop ");
+        assert_eq!(app.host(), "desktop");
+    }
+
+    #[test]
+    fn host_choices_list_default_hosts_and_custom() {
+        let mut app = app();
+        app.hosts.names = vec!["desktop".to_owned(), "laptop".to_owned()];
+        let choices = app.host_choices();
+        assert!(matches!(
+            choices.as_slice(),
+            [
+                HostChoice::Default,
+                HostChoice::Host(first),
+                HostChoice::Host(second),
+                HostChoice::Custom,
+            ] if first == "desktop" && second == "laptop"
+        ));
+    }
+
+    #[test]
+    fn picking_a_host_fills_the_host_field() {
+        let mut app = app();
+        app.hosts.names = vec!["desktop".to_owned()];
+        app.mode = Mode::PickHost(ListState::default().with_selected(Some(1)));
+        app.on_host_picker_key(KeyEvent::from(KeyCode::Enter));
+        assert!(matches!(app.mode, Mode::Form));
+        assert_eq!(app.args(), ["-H", "desktop"]);
+    }
+
+    #[test]
+    fn picking_the_default_clears_the_host_field() {
+        let mut app = app();
+        type_text(&mut app, 'H', "desktop");
+        app.mode = Mode::PickHost(ListState::default().with_selected(Some(0)));
+        app.on_host_picker_key(KeyEvent::from(KeyCode::Enter));
+        assert!(app.args().is_empty());
+    }
+
+    #[test]
+    fn picking_custom_edits_the_host_and_keeps_a_backup() {
+        let mut app = app();
+        type_text(&mut app, 'H', "desktop");
+        app.mode = Mode::PickHost(ListState::default().with_selected(Some(1)));
+        app.on_host_picker_key(KeyEvent::from(KeyCode::Enter));
+        assert!(matches!(&app.mode, Mode::Edit { backup } if backup == "desktop"));
+    }
+
+    #[test]
+    fn host_picker_opens_on_the_current_host() {
+        let mut app = app();
+        app.hosts.names = vec!["desktop".to_owned(), "laptop".to_owned()];
+        type_text(&mut app, 'H', "laptop");
+        app.open_host_picker();
+        assert!(matches!(&app.mode, Mode::PickHost(state) if state.selected() == Some(2)));
+    }
+
+    #[test]
+    fn syncing_inputs_keeps_the_selection_of_remaining_inputs() {
+        let mut app = app_with_inputs(&["home-manager", "nixpkgs", "sops-nix"]);
+        select_input(&mut app, "nixpkgs");
+        select_input(&mut app, "sops-nix");
+        app.inputs_state.select(Some(2));
+        app.status.inputs = vec!["disko".to_owned(), "nixpkgs".to_owned()];
+        app.sync_inputs();
+        assert_eq!(selected_inputs(&app), ["nixpkgs"]);
+        assert_eq!(app.inputs_state.selected(), Some(1));
+    }
+
+    #[test]
+    fn syncing_without_inputs_clears_the_cursor() {
+        let mut app = app_with_inputs(&["nixpkgs"]);
+        app.status.inputs.clear();
+        app.sync_inputs();
+        assert!(app.inputs.is_empty());
+        assert_eq!(app.inputs_state.selected(), None);
+    }
+
+    #[test]
+    fn selection_is_clamped_to_the_lists() {
+        let mut app = app_with_inputs(&["nixpkgs"]);
+        app.options_state.select(Some(99));
+        app.inputs_state.select(Some(99));
+        app.clamp_selection();
+        assert_eq!(app.options_state.selected(), Some(app.fields.len() - 1));
+        assert_eq!(app.inputs_state.selected(), Some(0));
+    }
+
+    #[test]
+    fn activating_toggles_options_and_inputs() {
+        let mut app = app_with_inputs(&["nixpkgs"]);
+        app.activate();
+        assert_eq!(app.args(), ["-p"]);
+        app.focus = Focus::Inputs;
+        app.inputs_state.select(Some(0));
+        app.activate();
+        assert_eq!(app.args(), ["-p", "-U", "nixpkgs"]);
+    }
+
+    #[test]
+    fn inputs_start_unselected() {
+        let app = app_with_inputs(&["nixpkgs"]);
+        assert!(matches!(
+            app.inputs.as_slice(),
+            [Input { name, selected: false }] if name == "nixpkgs"
+        ));
     }
 }

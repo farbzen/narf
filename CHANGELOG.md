@@ -21,7 +21,7 @@ and this project adheres to
 - Saved flake path in `~/.config/narf/flake`; the host defaults to the current
   hostname.
 - `narf-tui` terminal frontend with an options form, repository status
-  (upstream, unpushed commits, changes, inputs) and narf running in an
+  (upstream, unpushed commits, changes, inputs) and NARF running in an
   embedded terminal.
 - Nix flake with `narf`, `narf-tui` and `default` packages and an overlay for
   `x86_64-linux` and `aarch64-linux`; `narf` and `narf-tui` bring `nh` and
@@ -29,5 +29,20 @@ and this project adheres to
   system.
 - MIT license, declared in the Cargo manifests and in the `meta.license` of
   the Nix packages.
+- Standalone `package.nix` that fetches a tagged release via
+  `fetchFromGitHub`, so NARF can be installed by copying it into a NixOS
+  configuration without the flake.
+- Unit tests for argument parsing, tilde expansion, the commit message, the
+  TUI's command line, hints, host picker and input selection, and reading the
+  flake inputs from the lock file; they also run during the Nix build.
 
-[Unreleased]: https://github.com/farbzen/narf.nix/commits/main
+### Changed
+
+- The project name is spelled `NARF` in help texts, TUI labels and the
+  documentation; commands, packages and paths stay lowercase.
+- The Cargo workspace lives at the repository root (`narf/`, `narf-tui/`)
+  instead of under `packages/`.
+- The flake builds `package.nix` from the local checkout and no longer
+  depends on `flake-parts` and `nix-systems`.
+
+[Unreleased]: https://github.com/farbzen/narf/commits/main

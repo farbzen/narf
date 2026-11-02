@@ -46,7 +46,11 @@ pub fn commit_message(host: &str) -> String {
         return String::new();
     };
 
-    String::from_utf8_lossy(&output.stdout)
+    describe_current_generation(host, &String::from_utf8_lossy(&output.stdout))
+}
+
+fn describe_current_generation(host: &str, generations: &str) -> String {
+    generations
         .lines()
         .map(|line| line.split_whitespace().collect::<Vec<_>>())
         .find(|fields| fields.len() == 8 && fields[7] == "True")
@@ -57,4 +61,37 @@ pub fn commit_message(host: &str) -> String {
             )
         })
         .unwrap_or_default()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::describe_current_generation;
+
+    const GENERATIONS: &str = "\
+Generation  Build-date           NixOS version           Kernel       Configuration Revision  Specialisation  Current
+738         2026-11-02 12:58:09  26.11.20261020.02c087f  7.2.11-zen1  Unknown                 []              True
+737         2026-11-02 12:16:45  26.11.20261020.02c087f  7.2.11-zen1  Unknown                 []              False
+";
+
+    #[test]
+    fn describes_the_current_generation() {
+        assert_eq!(
+            describe_current_generation("laptop", GENERATIONS),
+            "rebuild(laptop): Generation 738\n\n\
+             NixOS 26.11.20261020.02c087f\n\
+             Linux 7.2.11-zen1\n\n\
+             Built: 2026-11-02T12:58:09"
+        );
+    }
+
+    #[test]
+    fn ignores_generations_that_are_not_current() {
+        let without_current = GENERATIONS.replace("True", "False");
+        assert_eq!(describe_current_generation("laptop", &without_current), "");
+    }
+
+    #[test]
+    fn is_empty_without_generations() {
+        assert_eq!(describe_current_generation("laptop", ""), "");
+    }
 }

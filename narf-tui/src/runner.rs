@@ -1,4 +1,4 @@
-//! Runs narf inside a pseudo terminal and mirrors its screen.
+//! Runs NARF inside a pseudo terminal and mirrors its screen.
 
 use std::{
     io::{Read, Write},

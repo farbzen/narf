@@ -10,7 +10,7 @@ use std::{ffi::OsString, process::Command};
 
 use clap::Parser;
 
-/// Parses `args` (including the program name) and runs narf, returning the
+/// Parses `args` (including the program name) and runs NARF, returning the
 /// exit code: 0 on success, 1 if a step failed, 2 for invalid arguments.
 pub fn run<I, T>(args: I) -> i32
 where

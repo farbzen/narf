@@ -1,7 +1,7 @@
-//! narf-tui - Terminal frontend for narf.
+//! narf-tui - Terminal frontend for NARF.
 //!
-//! Lets you pick narf's options in a form, shows the state of the flake
-//! repository and runs narf inside an embedded pseudo terminal, so its
+//! Lets you pick NARF's options in a form, shows the state of the flake
+//! repository and runs NARF inside an embedded pseudo terminal, so its
 //! interactive prompts keep working.
 
 mod app;
@@ -13,7 +13,7 @@ use std::ffi::OsString;
 
 use anyhow::{Result, bail};
 
-/// Hidden flag making the binary run narf itself; the TUI starts itself
+/// Hidden flag making the binary run NARF itself; the TUI starts itself
 /// with it inside the pseudo terminal.
 const EXEC_FLAG: &str = "--exec";
 
@@ -30,7 +30,7 @@ fn main() -> Result<()> {
         match arg.to_string_lossy().as_ref() {
             "-h" | "--help" => {
                 println!(
-                    "narf-tui - TUI frontend for narf\n\n\
+                    "narf-tui - TUI frontend for NARF\n\n\
                      Usage: narf-tui [OPTIONS]\n\n\
                      Options:\n  \
                      -h, --help  Print help"

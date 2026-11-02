@@ -228,7 +228,7 @@ fn draw_form(frame: &mut Frame, app: &mut App) {
             ("j/k", "move"),
             ("Space", "toggle/edit"),
             ("Tab", "options/inputs"),
-            ("r", "run narf"),
+            ("r", "run NARF"),
             ("R", "reload"),
             ("q", "quit"),
         ])
@@ -345,7 +345,7 @@ fn status_lines(app: &App) -> Vec<Line<'static>> {
     if status.changes.is_empty() {
         lines.push(row(
             "Changes",
-            dim("none - narf will ask before rebuilding anyway".to_owned()),
+            dim("none - NARF will ask before rebuilding anyway".to_owned()),
         ));
     } else {
         lines.push(row(
@@ -410,8 +410,8 @@ fn draw_run(frame: &mut Frame, runner: &Runner, command: &str) {
     let footer_keys = if runner.running() {
         keys(&[
             ("PgUp/PgDn", "scroll"),
-            ("keys", "go to narf"),
-            ("C-c", "abort narf"),
+            ("keys", "go to NARF"),
+            ("C-c", "abort NARF"),
         ])
     } else {
         keys(&[("PgUp/PgDn", "scroll"), ("q/Enter", "back to options")])

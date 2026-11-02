@@ -1,4 +1,4 @@
-//! The steps of a narf run: prepare, rebuild and commit, push.
+//! The steps of a NARF run: prepare, rebuild and commit, push.
 
 use anyhow::{Result, bail, ensure};
 

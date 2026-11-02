@@ -1,4 +1,4 @@
-//! Locating the flake and the settings narf works with.
+//! Locating the flake and the settings NARF works with.
 
 use std::{fs, path::PathBuf};
 
@@ -26,7 +26,7 @@ pub fn default_host() -> String {
         .unwrap_or_else(|_| "localhost".to_owned())
 }
 
-/// The directory holding narf's settings (~/.config/narf).
+/// The directory holding NARF's settings (~/.config/narf).
 fn config_dir() -> PathBuf {
     home().unwrap_or_default().join(".config/narf")
 }
@@ -92,4 +92,35 @@ pub fn init(args: &Args) -> Result<Flake> {
         action: if args.build_only { "build" } else { "switch" },
         path,
     })
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{expand_tilde, home};
+
+    fn home_dir() -> String {
+        home().expect("HOME is set").display().to_string()
+    }
+
+    #[test]
+    fn expands_a_lone_tilde_to_home() {
+        assert_eq!(expand_tilde("~"), home_dir());
+    }
+
+    #[test]
+    fn expands_a_leading_tilde_slash() {
+        assert_eq!(expand_tilde("~/nixos"), format!("{}/nixos", home_dir()));
+    }
+
+    #[test]
+    fn keeps_tilde_user_paths() {
+        assert_eq!(expand_tilde("~alice/nixos"), "~alice/nixos");
+    }
+
+    #[test]
+    fn keeps_paths_without_leading_tilde() {
+        assert_eq!(expand_tilde("/etc/nixos"), "/etc/nixos");
+        assert_eq!(expand_tilde("nixos/~"), "nixos/~");
+        assert_eq!(expand_tilde(""), "");
+    }
 }
