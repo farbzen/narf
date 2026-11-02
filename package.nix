@@ -34,5 +34,13 @@ rustPlatform.buildRustPackage (finalAttrs: {
     license = lib.licenses.mit;
     platforms = lib.platforms.linux;
     mainProgram = "narf";
+    maintainers = [
+      {
+        email = "dev@farbzen.de";
+        github = "farbzen";
+        githubId = 60570640;
+        name = "Fabian Meier";
+      }
+    ];
   };
 })
