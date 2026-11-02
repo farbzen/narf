@@ -28,6 +28,14 @@ as rendering are not covered. `nix build` runs the tests as well.
 The workflow [`.github/workflows/rust.yml`](../.github/workflows/rust.yml)
 runs the same commands in the devenv shell on pushes to `main` and on pull
 requests that touch the Cargo workspace, the devenv files or the workflow.
+A build job runs `cargo build --workspace --release --locked` on
+`x86_64-linux` and `aarch64-linux` and attaches `narf` and `narf-tui` to the
+run as the artifacts `narf-x86_64-linux` and `narf-aarch64-linux`.
+
+> [!NOTE]
+> The ELF interpreter of the binaries points to the glibc in the Nix store of
+> the devenv shell, so they only run where that store path exists, such as
+> NixOS with the nixpkgs revision of `devenv.lock`.
 
 ## Build and check
 

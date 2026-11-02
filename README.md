@@ -7,6 +7,7 @@
 _NixOS Advanced Rebuild Flake_
 
 [![Version](https://img.shields.io/badge/version-0.1.0-blue?style=flat-square)](CHANGELOG.md)
+[![Build](https://img.shields.io/github/actions/workflow/status/farbzen/narf/rust.yml?branch=main&style=flat-square&label=build)](https://github.com/farbzen/narf/actions/workflows/rust.yml)
 [![Nix Flake](https://img.shields.io/badge/nix-flake-5277C3?style=flat-square&logo=nixos&logoColor=white)](flake.nix)
 [![Rust](https://img.shields.io/badge/rust-2024-orange?style=flat-square&logo=rust)](Cargo.toml)
 [![License](https://img.shields.io/badge/license-MIT-green?style=flat-square)](LICENSE)
@@ -31,7 +32,8 @@ copied into a NixOS configuration and fetches the release from GitHub on its
 own. The flake builds the same derivation from the local checkout and exposes
 it as packages and as an overlay for Linux systems (`x86_64-linux`,
 `aarch64-linux`). A GitHub Actions workflow checks formatting, runs clippy and
-the unit tests on every change to the Rust code.
+the unit tests and builds the release binaries for both systems on every
+change to the Rust code.
 
 The repository consists of the following applications:
 
