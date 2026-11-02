@@ -8,6 +8,8 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-11-02
+
 ### Added
 
 - `narf` command-line tool that rebuilds a NixOS flake via `nh` and commits
@@ -36,13 +38,5 @@ and this project adheres to
   TUI's command line, hints, host picker and input selection, and reading the
   flake inputs from the lock file; they also run during the Nix build.
 
-### Changed
-
-- The project name is spelled `NARF` in help texts, TUI labels and the
-  documentation; commands, packages and paths stay lowercase.
-- The Cargo workspace lives at the repository root (`narf/`, `narf-tui/`)
-  instead of under `packages/`.
-- The flake builds `package.nix` from the local checkout and no longer
-  depends on `flake-parts` and `nix-systems`.
-
-[Unreleased]: https://github.com/farbzen/narf/commits/main
+[Unreleased]: https://github.com/farbzen/narf/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/farbzen/narf/releases/tag/v1.0.0
