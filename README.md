@@ -6,11 +6,11 @@
 
 _NixOS Advanced Rebuild Flake_
 
-[![Version](https://img.shields.io/badge/version-1.0.0-blue?style=flat-square)](CHANGELOG.md)
-[![Tests](https://img.shields.io/github/actions/workflow/status/farbzen/narf/rust.yml?branch=main&event=push&style=flat-square&label=tests)](https://github.com/farbzen/narf/actions/workflows/rust.yml?query=branch%3Amain+event%3Apush)
-[![Nix Flake](https://img.shields.io/badge/nix-flake-5277C3?style=flat-square&logo=nixos&logoColor=white)](flake.nix)
-[![Rust](https://img.shields.io/badge/rust-2024-orange?style=flat-square&logo=rust)](Cargo.toml)
-[![License](https://img.shields.io/badge/license-MIT-green?style=flat-square)](LICENSE)
+[![Version](https://img.shields.io/badge/version-1.0.0-blue?style=for-the-badge)](CHANGELOG.md)
+[![Tests](https://img.shields.io/github/actions/workflow/status/farbzen/narf/rust.yml?branch=main&event=push&style=for-the-badge&label=tests)](https://github.com/farbzen/narf/actions/workflows/rust.yml?query=branch%3Amain+event%3Apush)
+[![Nix Flake](https://img.shields.io/badge/nix-flake-5277C3?style=for-the-badge&logo=nixos&logoColor=white)](flake.nix)
+[![Rust](https://img.shields.io/badge/rust-2024-orange?style=for-the-badge&logo=rust)](Cargo.toml)
+[![License](https://img.shields.io/badge/license-MIT-green?style=for-the-badge)](LICENSE)
 
 [Overview](#overview) • [Features](#features) •
 [Getting Started](#getting-started) • [Documentation](#documentation)
