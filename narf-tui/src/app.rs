@@ -467,6 +467,7 @@ impl App {
                     KeyCode::Char(' ') | KeyCode::Enter => self.activate(),
                     KeyCode::Char('R') => self.reload_status(),
                     KeyCode::Char('r') => self.start(terminal)?,
+                    KeyCode::Char(flag) => self.activate_flag(flag),
                     _ => {}
                 }
                 self.clamp_selection();
@@ -531,6 +532,16 @@ impl App {
                 }
             }
         }
+    }
+
+    /// Selects the option of `flag` and toggles or edits it.
+    fn activate_flag(&mut self, flag: char) {
+        let Some(index) = self.fields.iter().position(|f| f.flag == flag) else {
+            return;
+        };
+        self.focus = Focus::Options;
+        self.options_state.select(Some(index));
+        self.activate();
     }
 
     fn start(&mut self, terminal: &mut DefaultTerminal) -> Result<()> {
@@ -862,6 +873,44 @@ mod tests {
         app.inputs_state.select(Some(0));
         app.activate();
         assert_eq!(app.args(), ["-p", "-U", "nixpkgs"]);
+    }
+
+    #[test]
+    fn flag_keys_toggle_their_option_from_the_inputs() {
+        let mut app = app_with_inputs(&["nixpkgs"]);
+        app.focus = Focus::Inputs;
+        app.activate_flag('P');
+        assert_eq!(app.args(), ["-P"]);
+        assert!(app.focus == Focus::Options);
+        assert_eq!(app.selected_field().map(|f| f.flag), Some('P'));
+        app.activate_flag('P');
+        assert!(app.args().is_empty());
+    }
+
+    #[test]
+    fn flag_keys_edit_text_options_and_pick_the_host() {
+        let mut app = app();
+        type_text(&mut app, 'c', "kernel");
+        app.activate_flag('c');
+        assert!(matches!(&app.mode, Mode::Edit { backup } if backup == "kernel"));
+        app.mode = Mode::Form;
+        app.activate_flag('H');
+        assert!(matches!(app.mode, Mode::PickHost(_)));
+    }
+
+    #[test]
+    fn unknown_flag_keys_change_nothing() {
+        let mut app = app();
+        app.activate_flag('x');
+        assert!(app.args().is_empty());
+        assert!(matches!(app.mode, Mode::Form));
+    }
+
+    #[test]
+    fn flag_keys_do_not_collide_with_form_keys() {
+        for field in default_fields() {
+            assert!(!"qjkhlgGrR".contains(field.flag), "-{}", field.flag);
+        }
     }
 
     #[test]

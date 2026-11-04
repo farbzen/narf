@@ -8,6 +8,14 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [2.1.0] - 2026-11-04
+
+### Added
+
+- `narf-tui` sets each option by pressing its flag letter (e.g. `p` toggles
+  Pull, `c` edits the comment, `H` opens the host picker); text options now
+  show their flag as well.
+
 ## [2.0.0] - 2026-11-04
 
 ### Changed
@@ -50,6 +58,7 @@ and this project adheres to
   TUI's command line, hints, host picker and input selection, and reading the
   flake inputs from the lock file; they also run during the Nix build.
 
-[Unreleased]: https://github.com/farbzen/narf/compare/v2.0.0...HEAD
+[Unreleased]: https://github.com/farbzen/narf/compare/v2.1.0...HEAD
+[2.1.0]: https://github.com/farbzen/narf/compare/v2.0.0...v2.1.0
 [2.0.0]: https://github.com/farbzen/narf/compare/v1.0.0...v2.0.0
 [1.0.0]: https://github.com/farbzen/narf/releases/tag/v1.0.0

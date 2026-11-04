@@ -6,7 +6,7 @@
 
 _NixOS Advanced Rebuild Flake_
 
-[![Version](https://img.shields.io/badge/version-2.0.0-blue?style=for-the-badge&labelColor=081216)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-2.1.0-blue?style=for-the-badge&labelColor=081216)](CHANGELOG.md)
 [![Tests](https://img.shields.io/github/actions/workflow/status/farbzen/narf/rust.yml?branch=main&event=push&style=for-the-badge&labelColor=081216&label=tests)](https://github.com/farbzen/narf/actions/workflows/rust.yml?query=branch%3Amain+event%3Apush)
 [![Nix Flake](https://img.shields.io/badge/nix-flake-5277C3?style=for-the-badge&labelColor=081216&logo=nixos&logoColor=white)](flake.nix)
 [![Rust](https://img.shields.io/badge/rust-2024-orange?style=for-the-badge&labelColor=081216&logo=rust)](Cargo.toml)
@@ -52,8 +52,9 @@ The repository consists of the following applications:
   failing rebuilds (`-t`).
 - **Remembered flake**: the flake path is saved in `~/.config/narf/flake`, the
   host defaults to the current hostname.
-- **TUI**: pick options in a form, see the repository state (upstream,
-  unpushed commits, changes, inputs) and run NARF in an embedded terminal.
+- **TUI**: pick options in a form or by their flag letter, see the repository
+  state (upstream, unpushed commits, changes, inputs) and run NARF in an
+  embedded terminal.
 
 ## Getting Started
 

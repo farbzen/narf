@@ -17,6 +17,7 @@ use crate::{
 
 const HIGHLIGHT: &str = "› ";
 const LABEL_WIDTH: usize = 9;
+const TEXT_FLAG_WIDTH: usize = "-x ".len();
 
 pub fn draw(frame: &mut Frame, app: &mut App) {
     if let Mode::Run(runner) = &app.mode {
@@ -105,6 +106,7 @@ fn draw_form(frame: &mut Frame, app: &mut App) {
                 ]),
                 Value::Text(text) => Line::from(vec![
                     Span::raw(format!("{:<LABEL_WIDTH$}", field.label)),
+                    Span::styled(format!("-{} ", field.flag), Style::new().dark_gray()),
                     if text.is_empty() {
                         Span::styled(
                             format!("({})", placeholder(field.flag)),
@@ -135,7 +137,9 @@ fn draw_form(frame: &mut Frame, app: &mut App) {
         && let Value::Text(text) = &app.fields[index].value
     {
         let inner = Block::bordered().inner(options_area);
-        let x = inner.x + (HIGHLIGHT.chars().count() + LABEL_WIDTH + text.chars().count()) as u16;
+        let x = inner.x
+            + (HIGHLIGHT.chars().count() + LABEL_WIDTH + TEXT_FLAG_WIDTH + text.chars().count())
+                as u16;
         let y = inner.y + (index - app.options_state.offset()) as u16;
         frame.set_cursor_position(Position::new(x.min(inner.right().saturating_sub(1)), y));
     }
@@ -227,6 +231,7 @@ fn draw_form(frame: &mut Frame, app: &mut App) {
         keys(&[
             ("j/k", "move"),
             ("Space", "toggle/edit"),
+            ("p…H", "set flag"),
             ("Tab", "options/inputs"),
             ("r", "run NARF"),
             ("R", "reload"),
