@@ -8,6 +8,18 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [2.0.0] - 2026-11-04
+
+### Changed
+
+- `-n` is now `--no-rebuild` (formerly `--skip-unchanged`): it always skips
+  the rebuild and only pulls (with `-p`) and pushes (with `-P`, squashing as
+  before) existing commits, leaving uncommitted changes unstaged and
+  uncommitted. It can no longer be combined with `-u`, `-U`, `-c`, `-b` or
+  `-t`; `narf-tui` hints at these combinations.
+- Squashing aborts when changes are already staged instead of adding them to
+  the squashed commit.
+
 ## [1.0.0] - 2026-11-02
 
 ### Added
@@ -38,5 +50,6 @@ and this project adheres to
   TUI's command line, hints, host picker and input selection, and reading the
   flake inputs from the lock file; they also run during the Nix build.
 
-[Unreleased]: https://github.com/farbzen/narf/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/farbzen/narf/compare/v2.0.0...HEAD
+[2.0.0]: https://github.com/farbzen/narf/compare/v1.0.0...v2.0.0
 [1.0.0]: https://github.com/farbzen/narf/releases/tag/v1.0.0

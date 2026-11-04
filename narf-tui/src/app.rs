@@ -112,8 +112,8 @@ fn default_fields() -> Vec<Field> {
         Field::toggle('t', "Show trace", "Show trace of the rebuild"),
         Field::toggle(
             'n',
-            "Skip unchanged",
-            "Do not rebuild if no changes were found",
+            "No rebuild",
+            "Skip the rebuild and only push existing commits",
         ),
         Field::toggle(
             'y',
@@ -256,6 +256,17 @@ impl App {
         }
         if !self.text('c').is_empty() && (self.toggled('d') || self.toggled('b')) {
             hints.push("No commit (and no comment) in dry/build-only mode".to_owned());
+        }
+        if self.toggled('n')
+            && (self.toggled('u')
+                || self.inputs.iter().any(|i| i.selected)
+                || !self.text('c').is_empty()
+                || self.toggled('b')
+                || self.toggled('t'))
+        {
+            hints.push(
+                "No rebuild can't be combined with update, comment, build only or trace".to_owned(),
+            );
         }
         if self.toggled('u') && self.inputs.iter().any(|i| i.selected) {
             hints.push("Update all inputs overrides the input selection".to_owned());
@@ -724,6 +735,18 @@ mod tests {
         switch_on(&mut app, 'P');
         switch_on(&mut app, 'b');
         assert_eq!(app.hints(), ["Push is skipped in dry/build-only mode"]);
+    }
+
+    #[test]
+    fn hints_that_no_rebuild_conflicts_with_rebuild_options() {
+        let mut app = app_with_inputs(&["nixpkgs"]);
+        switch_on(&mut app, 'n');
+        assert!(app.hints().is_empty());
+        select_input(&mut app, "nixpkgs");
+        assert_eq!(
+            app.hints(),
+            ["No rebuild can't be combined with update, comment, build only or trace"]
+        );
     }
 
     #[test]

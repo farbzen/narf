@@ -6,7 +6,7 @@
 
 _NixOS Advanced Rebuild Flake_
 
-[![Version](https://img.shields.io/badge/version-1.0.0-blue?style=for-the-badge&labelColor=081216)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-2.0.0-blue?style=for-the-badge&labelColor=081216)](CHANGELOG.md)
 [![Tests](https://img.shields.io/github/actions/workflow/status/farbzen/narf/rust.yml?branch=main&event=push&style=for-the-badge&labelColor=081216&label=tests)](https://github.com/farbzen/narf/actions/workflows/rust.yml?query=branch%3Amain+event%3Apush)
 [![Nix Flake](https://img.shields.io/badge/nix-flake-5277C3?style=for-the-badge&labelColor=081216&logo=nixos&logoColor=white)](flake.nix)
 [![Rust](https://img.shields.io/badge/rust-2024-orange?style=for-the-badge&labelColor=081216&logo=rust)](Cargo.toml)
@@ -46,8 +46,8 @@ The repository consists of the following applications:
   before rebuilding.
 - **Git sync**: pull before (`-p`) and push after (`-P`) the rebuild, with
   unpushed rebuild commits squashed into one unless `-S` is given.
-- **Safe modes**: dry run (`-d`), build without switching (`-b`) and skipping
-  unchanged flakes (`-n`).
+- **Safe modes**: dry run (`-d`), build without switching (`-b`) and pushing
+  existing commits without rebuilding (`-n`).
 - **Scriptable**: answer all prompts with yes (`-y`) and show a trace of
   failing rebuilds (`-t`).
 - **Remembered flake**: the flake path is saved in `~/.config/narf/flake`, the

@@ -26,9 +26,13 @@ pub struct Args {
     #[arg(short = 'H', long)]
     pub host: Option<String>,
 
-    /// Do not rebuild if no changes were found
-    #[arg(short = 'n', long)]
-    pub skip_unchanged: bool,
+    /// Skip the rebuild and only push (and squash) existing commits. Uncommitted changes are left untouched
+    #[arg(
+        short = 'n',
+        long,
+        conflicts_with_all = ["update", "update_input", "comment", "build_only", "trace"]
+    )]
+    pub no_rebuild: bool,
 
     /// Pull new commits from origin before running
     #[arg(short, long)]
@@ -78,7 +82,7 @@ mod tests {
     #[test]
     fn everything_is_off_without_arguments() {
         let args = parse(&[]);
-        assert!(!args.build_only && !args.dry && !args.skip_unchanged);
+        assert!(!args.build_only && !args.dry && !args.no_rebuild);
         assert!(!args.pull && !args.push && !args.dont_squash_commits);
         assert!(!args.trace && !args.update && !args.yes);
         assert!(args.comment.is_none() && args.flake.is_none() && args.host.is_none());
@@ -87,10 +91,32 @@ mod tests {
 
     #[test]
     fn combined_short_flags_set_every_switch() {
-        let args = parse(&["-bdnptuyPS"]);
-        assert!(args.build_only && args.dry && args.skip_unchanged);
+        let args = parse(&["-bdptuyPS"]);
+        assert!(args.build_only && args.dry);
         assert!(args.pull && args.push && args.dont_squash_commits);
         assert!(args.trace && args.update && args.yes);
+    }
+
+    #[test]
+    fn no_rebuild_combines_with_pull_and_push() {
+        let args = parse(&["-npPS"]);
+        assert!(args.no_rebuild && args.pull && args.push && args.dont_squash_commits);
+    }
+
+    #[test]
+    fn no_rebuild_rejects_rebuild_options() {
+        for conflicting in [
+            &["-u"][..],
+            &["-U", "nixpkgs"],
+            &["-c", "comment"],
+            &["-b"],
+            &["-t"],
+        ] {
+            let args = ["narf", "-n"]
+                .into_iter()
+                .chain(conflicting.iter().copied());
+            assert!(Args::try_parse_from(args).is_err(), "{conflicting:?}");
+        }
     }
 
     #[test]

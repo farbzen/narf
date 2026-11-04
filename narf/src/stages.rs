@@ -17,7 +17,9 @@ pub fn run(args: &Args) -> Result<()> {
     let flake = flake::init(args)?;
 
     prep(args, &flake)?;
-    rebuild(args, &flake)?;
+    if !args.no_rebuild {
+        rebuild(args, &flake)?;
+    }
 
     if !args.push || args.dry || args.build_only {
         return Ok(());
@@ -26,7 +28,7 @@ pub fn run(args: &Args) -> Result<()> {
     push(args, &flake)
 }
 
-/// Pulls, updates inputs and stages all changes.
+/// Pulls, updates inputs and stages all changes (unless the rebuild is skipped).
 fn prep(args: &Args, flake: &Flake) -> Result<()> {
     ensure!(
         !args.pull || git::pull(&flake.path),
@@ -40,10 +42,12 @@ fn prep(args: &Args, flake: &Flake) -> Result<()> {
         );
     }
 
-    ensure!(
-        git::stage_all(&flake.path),
-        "There was an error while staging all changes! Exiting..."
-    );
+    if !args.no_rebuild {
+        ensure!(
+            git::stage_all(&flake.path),
+            "There was an error while staging all changes! Exiting..."
+        );
+    }
     Ok(())
 }
 
@@ -54,9 +58,7 @@ fn rebuild(args: &Args, flake: &Flake) -> Result<()> {
     if diff.is_empty() && !args.pull {
         let _ = cliclack::log::info("No changes found!");
 
-        if !args.skip_unchanged
-            && (args.yes || confirm(false, "Would you like to run the rebuild anyway?"))
-        {
+        if args.yes || confirm(false, "Would you like to run the rebuild anyway?") {
             ensure!(nix::rebuild(flake, args), REBUILD_FAILED);
         }
         return Ok(());
@@ -122,6 +124,11 @@ fn push(args: &Args, flake: &Flake) -> Result<()> {
     {
         return Ok(());
     }
+
+    ensure!(
+        git::staged_diff(path).is_empty(),
+        "There are staged changes that would end up in the squashed commit! Exiting..."
+    );
 
     let latest_message = git::latest_message(path);
 
