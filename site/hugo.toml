@@ -1,0 +1,53 @@
+baseURL = "https://farbzen.github.io/narf/"
+locale = "en-US"
+title = "NARF"
+enableGitInfo = false
+
+[module]
+  [[module.imports]]
+    path = "github.com/colinwilson/lotusdocs"
+  [[module.imports]]
+    path = "github.com/gohugoio/hugo-mod-bootstrap-scss/v5"
+
+  [[module.mounts]]
+    source = "content"
+    target = "content"
+  [[module.mounts]]
+    source = "layouts"
+    target = "layouts"
+  [[module.mounts]]
+    source = "data"
+    target = "data"
+  [[module.mounts]]
+    source = "../docs"
+    target = "assets/narf-docs"
+  [[module.mounts]]
+    source = "../.assets"
+    target = "assets/images"
+
+[markup]
+  [markup.goldmark.renderer]
+    unsafe = true
+  [markup.tableOfContents]
+    startLevel = 2
+    endLevel = 3
+
+[params]
+  [params.docs]
+    title = "NARF"
+    themeColor = "blue"
+    darkMode = true
+    repoURL = "https://github.com/farbzen/narf"
+    repoBranch = "main"
+    toc = true
+    breadcrumbs = true
+    backToTop = true
+    prism = true
+  [params.social]
+    github = "farbzen/narf"
+
+[[menu.primary]]
+  name = "Docs"
+  url = "/docs/"
+  identifier = "docs"
+  weight = 10

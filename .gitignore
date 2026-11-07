@@ -4,3 +4,6 @@ result-*
 .direnv/
 /target
 /.claude
+site/public/
+site/resources/
+.hugo_build.lock

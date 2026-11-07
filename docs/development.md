@@ -61,10 +61,33 @@ nix run nixpkgs#alejandra -- flake.nix package.nix
 | `narf-tui/`   | `narf-tui` crate: terminal frontend                          |
 | `package.nix` | standalone derivation that fetches a release from GitHub     |
 | `flake.nix`   | flake outputs; builds `package.nix` from the local checkout  |
+| `docs/`       | documentation, also the content of the documentation site    |
+| `site/`       | [Hugo](https://gohugo.io) site for the documentation         |
 
 The flake overrides `src`, `version` and `cargoDeps` of `package.nix` with the
 local workspace, so `hash` and `cargoHash` in `package.nix` only matter for
 builds outside the flake.
+
+## Documentation site
+
+The documentation at <https://farbzen.github.io/narf/> is built with
+[Hugo](https://gohugo.io) and the [Lotus Docs](https://lotusdocs.dev) theme,
+which Hugo fetches as a module (hence `go` in the devenv shell). The Markdown
+files in `docs/` are the only source: `site/content/docs/_content.gotmpl`
+turns each of them into a page, with the first heading as its title. Render
+hooks in `site/layouts/docs/_markup/` turn GitHub alerts into Lotus Docs alerts
+and links to other files of the repository into links to GitHub.
+
+```sh
+hugo server --source site               # preview on http://localhost:1313/narf/
+hugo --source site --gc --minify        # build into site/public
+```
+
+New files in `docs/` need an entry in the weight and icon maps of
+`_content.gotmpl` to get their place in the sidebar. The workflow
+[`.github/workflows/docs.yml`](../.github/workflows/docs.yml) builds the site
+in the devenv shell and deploys it to GitHub Pages on pushes to `main` that
+touch `docs/`, `site/`, `.assets/`, the devenv files or the workflow.
 
 ## Release
 

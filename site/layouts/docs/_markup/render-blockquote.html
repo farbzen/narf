@@ -1,0 +1,15 @@
+{{- if eq .Type "alert" }}
+  {{- $contexts := dict "note" "info" "tip" "success" "important" "primary" "warning" "warning" "caution" "danger" }}
+  {{- $icons := dict "info" "info" "success" "check_circle" "primary" "info" "warning" "warning" "danger" "report" }}
+  {{- $context := index $contexts .AlertType | default "info" }}
+<div class="alert alert-{{ $context }} d-flex" role="alert">
+  <div class="flex-shrink-1 alert-icon">
+    <span class="material-icons size-20 me-2">{{ index $icons $context }}</span>
+  </div>
+  <div class="w-100">{{ .Text }}</div>
+</div>
+{{- else }}
+<blockquote>
+  {{ .Text }}
+</blockquote>
+{{- end }}

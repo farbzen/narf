@@ -1,5 +1,7 @@
 {pkgs, ...}: {
   packages = with pkgs; [
+    go
+    hugo
     openssl
     pkg-config
   ];
