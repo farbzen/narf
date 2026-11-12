@@ -116,6 +116,7 @@ source lives in `docs/`:
 - [TUI: layout and keys](docs/tui.md)
 - [Development environment, tests, build, documentation and release](docs/development.md)
 - [Changelog](CHANGELOG.md)
+- [Legal Notice](docs/legal.md)
 
 ## License
 

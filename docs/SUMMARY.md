@@ -6,3 +6,7 @@
 - [Usage](usage.md)
 - [TUI](tui.md)
 - [Development](development.md)
+
+---
+
+[Legal Notice](legal.md)
