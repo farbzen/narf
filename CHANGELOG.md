@@ -8,6 +8,11 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Removed
+
+- Standalone `package.nix`; NARF is now installed only via the flake, which
+  builds the derivation itself.
+
 ## [2.1.0] - 2026-11-04
 
 ### Added
