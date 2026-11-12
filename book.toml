@@ -1,0 +1,15 @@
+[book]
+title = "NARF"
+description = "NixOS Advanced Rebuild Flake: rebuild a NixOS configuration flake and record every rebuild as a git commit."
+authors = ["farbzen"]
+language = "en"
+src = "docs"
+
+[build]
+build-dir = "book"
+
+[output.html]
+site-url = "/"
+cname = "narf.farbzen.de"
+git-repository-url = "https://github.com/farbzen/narf"
+edit-url-template = "https://github.com/farbzen/narf/edit/main/{path}"

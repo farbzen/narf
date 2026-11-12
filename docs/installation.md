@@ -54,7 +54,7 @@ nix run github:farbzen/narf#narf-tui
 
 ## Install without the flake
 
-[`package.nix`](../package.nix) is a self-contained derivation in nixpkgs
+[`package.nix`](https://github.com/farbzen/narf/blob/main/package.nix) is a self-contained derivation in nixpkgs
 style: it fetches the tagged release with `fetchFromGitHub` and builds it with
 the nixpkgs of the importing configuration. Copy it into the configuration,
 for example as `narf.nix`, and call it:

@@ -10,7 +10,7 @@ _NixOS Advanced Rebuild Flake_
 [![Tests](https://img.shields.io/github/actions/workflow/status/farbzen/narf/rust.yml?branch=main&event=push&style=for-the-badge&labelColor=081216&label=tests)](https://github.com/farbzen/narf/actions/workflows/rust.yml?query=branch%3Amain+event%3Apush)
 [![Nix Flake](https://img.shields.io/badge/nix-flake-5277C3?style=for-the-badge&labelColor=081216&logo=nixos&logoColor=white)](flake.nix)
 [![Rust](https://img.shields.io/badge/rust-2024-orange?style=for-the-badge&labelColor=081216&logo=rust)](Cargo.toml)
-[![Docs](https://img.shields.io/badge/docs-github%20pages-0A7EA4?style=for-the-badge&labelColor=081216)](https://farbzen.github.io/narf/)
+[![Docs](https://img.shields.io/badge/docs-mdbook-0A7EA4?style=for-the-badge&labelColor=081216)](https://narf.farbzen.de/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-B0BFC9?style=for-the-badge&labelColor=081216)](LICENSE)
 [![Ko-Fi donate](https://img.shields.io/badge/donate-kofi?style=for-the-badge&labelColor=081216&color=ee5556&logo=ko-fi&logoColor=white)](https://ko-fi.com/farbzen)
 
@@ -108,13 +108,13 @@ offers to save a new `--flake` value there. All options: `narf --help` and
 
 ## Documentation
 
-The documentation is published at <https://farbzen.github.io/narf/>; its
+The documentation is published at <https://narf.farbzen.de/>; its
 source lives in `docs/`:
 
 - [Installation and flake outputs](docs/installation.md)
 - [Usage: options, steps of a run, commit message](docs/usage.md)
 - [TUI: layout and keys](docs/tui.md)
-- [Development environment, tests, build, documentation site and release](docs/development.md)
+- [Development environment, tests, build, documentation and release](docs/development.md)
 - [Changelog](CHANGELOG.md)
 
 ## License
