@@ -8,6 +8,8 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [3.0.0] - 2026-11-12
+
 ### Removed
 
 - Standalone `package.nix`; NARF is now installed only via the flake, which
@@ -63,7 +65,8 @@ and this project adheres to
   TUI's command line, hints, host picker and input selection, and reading the
   flake inputs from the lock file; they also run during the Nix build.
 
-[Unreleased]: https://github.com/farbzen/narf/compare/v2.1.0...HEAD
+[Unreleased]: https://github.com/farbzen/narf/compare/v3.0.0...HEAD
+[3.0.0]: https://github.com/farbzen/narf/compare/v2.1.0...v3.0.0
 [2.1.0]: https://github.com/farbzen/narf/compare/v2.0.0...v2.1.0
 [2.0.0]: https://github.com/farbzen/narf/compare/v1.0.0...v2.0.0
 [1.0.0]: https://github.com/farbzen/narf/releases/tag/v1.0.0
